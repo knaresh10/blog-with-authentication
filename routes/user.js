@@ -13,11 +13,15 @@ router.get('/signup', (req, res) => {
 
 router.post('/signin', async (req, res) => {
     const { email, password } = req.body
-    const user = await User.matchPassword(email, password)
+    try {
+        const token = await User.matchPasswordAndGenerateToken(email, password)
+        return res.cookie('token', token).redirect('/')
+    } catch(e) {
+        res.render('signin', {
+            error : "Incorrect email or password"
+        })
+    }
 
-    console.log('User', user)
-
-    return res.redirect('/')
 })
 router.post('/signup',async (req, res) => {
     const { fullName, email, password } = req.body
@@ -27,6 +31,10 @@ router.post('/signup',async (req, res) => {
         password,
     })
     return res.redirect('/')
+})
+
+router.get('/logout', (req, res) => {
+    res.clearCookie('token').redirect('/')
 })
 
 module.exports = router
