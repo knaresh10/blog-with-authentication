@@ -23,8 +23,13 @@ router.get("/add_new", (req, res) => {
     })
 })
 
-router.get('/:id', (req, res) => {
-
+router.get('/:id', async (req, res) => {
+    const blog = await Blog.findById(req.params.id).populate('createdBy')
+    console.log(blog)
+    res.render('blogview', {
+        user: req.user,
+        blog: blog
+    })
 })
 router.post('/', upload.single('coverImage'), async (req, res) => {
     const {title, body} = req.body
